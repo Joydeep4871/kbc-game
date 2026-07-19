@@ -1,0 +1,10 @@
+[
+  "tests/test_core.py::test_below_safe_haven_no_floor",
+  "tests/test_core.py::test_fifty_fifty_removes_two_wrong",
+  "tests/test_core.py::test_rotation_two_seeds_differ",
+  "tests/test_core.py::test_round_is_one_per_ascending_tier",
+  "tests/test_core.py::test_round_progression_to_chro",
+  "tests/test_core.py::test_safe_haven_floor_holds",
+  "tests/test_core.py::test_timed_rungs_only_first_three",
+  "tests/test_core.py::test_timer_pause_resume_math"
+]

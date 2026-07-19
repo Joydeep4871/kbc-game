@@ -1,2 +1,8 @@
-# kbc-game
-Kaun banega CHRO, a "Who wants to be a Millionaire" copy that simulates the use of Python Libraries in HR Automations and functions. Not made for monetary purposes, educational applications only
+# pytest cache directory #
+
+This directory contains data from the pytest's cache plugin,
+which provides the `--lf` and `--ff` options, as well as the `cache` fixture.
+
+**Do not** commit this to version control.
+
+See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more information.

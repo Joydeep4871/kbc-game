@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk ls *)",
+      "Bash(rtk pytest *)",
+      "Bash(python -c \"import streamlit; print\\('streamlit', streamlit.__version__\\)\")",
+      "Bash(rtk pip *)",
+      "Bash(python -c \"import streamlit; print\\('ok', streamlit.__version__\\)\")",
+      "Bash(/c/Users/rabha/AppData/Local/Programs/Python/Python312/python.exe ui/vertex_app.py)",
+      "Bash(echo \"launched pid $!\")"
+    ]
+  }
+}
