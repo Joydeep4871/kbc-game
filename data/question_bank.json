@@ -24,7 +24,7 @@
       "options": [
         "Python",
         "Spanish",
-        "Excel formulas only",
+        "Kannada",
         "Sanskrit"
       ],
       "correct_index": 0,
@@ -37,9 +37,9 @@
       "question": "In this game, what do you win for each correct answer instead of cash?",
       "options": [
         "A promotion to a higher HR role",
-        "A cash bonus at year-end",
+        "7 crores",
         "A company laptop",
-        "A longer lunch break"
+        "More Assignments"
       ],
       "correct_index": 0,
       "explanation": "Instead of cash, you climb the HR ladder: each right answer promotes you, from HR Intern at the bottom up to CHRO at the top."
@@ -53,7 +53,7 @@
         "Anyone can use and study it without paying",
         "It is owned by one company that charges per use",
         "It can only run inside Excel",
-        "You need a paid license key to install it"
+        "You need an Aadhar card to install it"
       ],
       "correct_index": 0,
       "explanation": "Open source means the code is public: anyone can use, read, and improve it for free. That is why these five HR libraries cost nothing."
@@ -67,7 +67,7 @@
         "Tidy, clean, and sort messy HR data",
         "It designs the company org chart",
         "It writes job descriptions automatically",
-        "It manages the payroll calendar"
+        "Eats 5 Star and does nothing"
       ],
       "correct_index": 0,
       "explanation": "Pandas loads a messy HRIS or payroll export and lets you clean blanks, fix duplicates, and group data, like a smarter spreadsheet you command with words."
@@ -81,7 +81,7 @@
         "Excel",
         "A shared Google Sheet",
         "Pen-and-paper personnel files",
-        "A printed monthly report"
+        "In their Feelings"
       ],
       "correct_index": 0,
       "explanation": "Excel is a common starting point. It works for simple reports, but the course shows where it taps out and why Python helps."
@@ -94,7 +94,7 @@
       "options": [
         "A table of rows and columns",
         "A printed Org chart",
-        "A folder of PDF forms",
+        "A Linways attendance sheet",
         "A live video feed of the office"
       ],
       "correct_index": 0,
@@ -108,7 +108,7 @@
       "options": [
         "Pandas",
         "Excel",
-        "A custom SQL database",
+        "AIMS Institutes Library",
         "A BI dashboard tool"
       ],
       "correct_index": 0,
@@ -123,7 +123,7 @@
         "Seaborn",
         "Pandas",
         "A presentation slide",
-        "An email summary"
+        "My Zomato order"
       ],
       "correct_index": 0,
       "explanation": "Seaborn is 'The Illustrator' and maps to 'show.' It turns workforce data into charts leaders can actually read."
@@ -137,7 +137,7 @@
         "Seaborn",
         "PowerPoint",
         "A printed report",
-        "An email attachment"
+        "Instagram"
       ],
       "correct_index": 0,
       "explanation": "Seaborn is the charting library. Analysis only creates value when leaders understand it, and Seaborn makes your findings boardroom-ready."
@@ -150,7 +150,7 @@
       "options": [
         "A p-value",
         "A 95% confidence range",
-        "A correlation score",
+        "Tea and Samosa",
         "A horoscope"
       ],
       "correct_index": 0,
@@ -163,7 +163,7 @@
       "question": "In Statsmodels, a p-value below 0.05 tells you what?",
       "options": [
         "The pattern is unlikely to be random chance",
-        "The data was collected correctly",
+        "RCB will win the IPL",
         "The sample size was large enough",
         "It is someone's birthday"
       ],
@@ -177,7 +177,7 @@
       "question": "Scikit-learn is 'The Forecaster.' What is its headline job?",
       "options": [
         "Predict what may happen next, like who might leave",
-        "Summarize last year's headcount",
+        "Summarize case studies in ChatGPT",
         "Measure training completion rates",
         "Bake a cake"
       ],
@@ -192,7 +192,7 @@
       "options": [
         "Fair factors like tenure and education",
         "The total headcount",
-        "Last year's budget",
+        "Controlling my calories",
         "The cafeteria menu"
       ],
       "correct_index": 0,
@@ -205,7 +205,7 @@
       "question": "After you clean data (Pandas) and do the math (NumPy), what comes next in the workflow?",
       "options": [
         "Show it with charts (Seaborn)",
-        "Share it in a team meeting",
+        "Share it in WhatsApp Status",
         "Save it to the HR drive",
         "Mail it to Mars"
       ],
@@ -219,7 +219,7 @@
       "question": "In a flight-risk model, what is 'feature importance'?",
       "options": [
         "A ranked list of what drives attrition most",
-        "The average tenure by team",
+        "The average weight of the office",
         "The cost of each open role",
         "The lunch menu"
       ],
@@ -232,8 +232,8 @@
       "difficulty": 6,
       "question": "Why does the course say Seaborn matters so much?",
       "options": [
-        "Analysis only creates value when leaders can understand it",
-        "It reduces the cost of software licenses",
+        "It transforms complex data into publication-ready statistical graphics",
+        "It reduces the cost of Rapido bookings",
         "It speeds up data entry",
         "It replaces the whole HR team"
       ],
@@ -248,7 +248,7 @@
       "options": [
         "Shaping the future",
         "Planning next year's hiring",
-        "Forecasting leave requests",
+        "Forecasting offer letters",
         "Writing fiction about employees"
       ],
       "correct_index": 0,
@@ -261,7 +261,7 @@
       "question": "To check a model honestly, you split data into training and test sets. Why bother?",
       "options": [
         "To test the model on data it never saw while learning",
-        "To use all the data efficiently",
+        "To send the model to Olympics",
         "To keep a backup copy of the file",
         "To confuse the computer"
       ],
