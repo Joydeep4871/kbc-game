@@ -2,12 +2,12 @@
   "meta": {
     "game": "Kaun Banega CHRO (KBC)",
     "audience": "MBA students with zero computer-science background",
-    "tone": "basic concepts only, no code required; some distractors are intentionally funny/absurd",
+    "tone": "basic concepts only, no code required. RunG 1-3: all options plausible. RUNG 4-7: exactly ONE funny/absurd distractor, the other two wrong options are normal/plausible (so 50-50 still strips a real wrong answer).",
     "source": "AIHR article 'HR Data Analytics: 5 Python Libraries You Need in HR' + the 16-slide teaching deck",
     "library_order_workflow": ["Pandas", "NumPy", "Seaborn", "Statsmodels", "Scikit-learn"],
     "mnemonic": "clean, calculate, show, check, predict",
     "schema": "id, library, difficulty(1-7), question, options[4], correct_index, explanation (code omitted on purpose: audience is non-technical)",
-    "note": "Seed bank. Expand to 4-5 per tier for richer rotation. draw_round() picks exactly one per tier, so difficulty always ramps 1..7."
+    "note": "Seed bank. Expand to 4-5 per tier for richer rotation. draw_round() picks exactly one per tier, so difficulty always ramps 1..7. Correct answer is always options[0]."
   },
   "questions": [
     {
@@ -24,7 +24,7 @@
       "library": "General",
       "difficulty": 1,
       "question": "In this game, what do you win for each correct answer instead of cash?",
-      "options": ["A promotion to a higher HR role", "Rupees in a briefcase", "A gold bar", "A free laptop"],
+      "options": ["A promotion to a higher HR role", "A cash bonus at year-end", "A company laptop", "A longer lunch break"],
       "correct_index": 0,
       "explanation": "Instead of cash, you climb the HR ladder: each right answer promotes you, from HR Intern at the bottom up to CHRO at the top."
     },
@@ -33,7 +33,7 @@
       "library": "General",
       "difficulty": 1,
       "question": "Python is described as 'free and open source.' What does that mean in practice?",
-      "options": ["Anyone can use and study it without paying", "It only works on Sundays", "One mystery person wrote it alone", "Copying it is illegal"],
+      "options": ["Anyone can use and study it without paying", "It is owned by one company that charges per use", "It can only run inside Excel", "You need a paid license key to install it"],
       "correct_index": 0,
       "explanation": "Open source means the code is public: anyone can use, read, and improve it for free. That is why these five HR libraries cost nothing."
     },
@@ -42,7 +42,7 @@
       "library": "Pandas",
       "difficulty": 2,
       "question": "Pandas is nicknamed 'The Organizer.' What is its main job?",
-      "options": ["Tidy, clean, and sort messy HR data", "Write poetry", "Cook dinner", "Book your flights"],
+      "options": ["Tidy, clean, and sort messy HR data", "It designs the company org chart", "It writes job descriptions automatically", "It manages the payroll calendar"],
       "correct_index": 0,
       "explanation": "Pandas loads a messy HRIS or payroll export and lets you clean blanks, fix duplicates, and group data, like a smarter spreadsheet you command with words."
     },
@@ -51,7 +51,7 @@
       "library": "General",
       "difficulty": 2,
       "question": "Before Python, where do many HR analysts start their data work?",
-      "options": ["Excel", "A typewriter", "A calculator watch", "Morse code"],
+      "options": ["Excel", "A shared Google Sheet", "Pen-and-paper personnel files", "A printed monthly report"],
       "correct_index": 0,
       "explanation": "Excel is a common starting point. It works for simple reports, but the course shows where it taps out and why Python helps."
     },
@@ -60,7 +60,7 @@
       "library": "General",
       "difficulty": 2,
       "question": "An HRIS or payroll export usually lands on your desk as what kind of data?",
-      "options": ["A table of rows and columns", "A single number", "A video clip", "A song"],
+      "options": ["A table of rows and columns", "A printed Org chart", "A folder of PDF forms", "A live video feed of the office"],
       "correct_index": 0,
       "explanation": "HR systems export tables: rows of employees, columns of attributes like department, salary, and attrition. Pandas is built to work with exactly this."
     },
@@ -69,7 +69,7 @@
       "library": "NumPy",
       "difficulty": 3,
       "question": "NumPy is 'The Calculator.' It is the math engine that sits underneath which other library?",
-      "options": ["Pandas", "A toaster", "Microsoft Word", "A guitar"],
+      "options": ["Pandas", "Excel", "A custom SQL database", "A BI dashboard tool"],
       "correct_index": 0,
       "explanation": "Pandas is built on top of NumPy. When you run a Pandas calculation, NumPy is often doing the math underneath, fast and reliably."
     },
@@ -78,7 +78,7 @@
       "library": "Seaborn",
       "difficulty": 3,
       "question": "The course mnemonic is 'clean, calculate, show, check, predict.' Which library is 'show'?",
-      "options": ["Seaborn", "Pandas", "A whiteboard", "A megaphone"],
+      "options": ["Seaborn", "Pandas", "A presentation slide", "An email summary"],
       "correct_index": 0,
       "explanation": "Seaborn is 'The Illustrator' and maps to 'show.' It turns workforce data into charts leaders can actually read."
     },
@@ -87,7 +87,7 @@
       "library": "Seaborn",
       "difficulty": 3,
       "question": "Which library is 'The Illustrator' that helps you build charts for a CFO or CHRO?",
-      "options": ["Seaborn", "A paintbrush set", "A camera", "A sticker book"],
+      "options": ["Seaborn", "PowerPoint", "A printed report", "An email attachment"],
       "correct_index": 0,
       "explanation": "Seaborn is the charting library. Analysis only creates value when leaders understand it, and Seaborn makes your findings boardroom-ready."
     },
@@ -96,7 +96,7 @@
       "library": "Statsmodels",
       "difficulty": 4,
       "question": "Statsmodels is 'The Auditor.' What does it give you to prove a finding is real?",
-      "options": ["A p-value", "A lucky coin", "A horoscope", "A rumor from the cafeteria"],
+      "options": ["A p-value", "A 95% confidence range", "A correlation score", "A horoscope"],
       "correct_index": 0,
       "explanation": "Statsmodels produces p-values. A p-value below 0.05 says a pattern is unlikely to be chance alone, turning 'looks like a gap' into 'this is a gap.'"
     },
@@ -105,7 +105,7 @@
       "library": "Statsmodels",
       "difficulty": 4,
       "question": "In Statsmodels, a p-value below 0.05 tells you what?",
-      "options": ["The pattern is unlikely to be random chance", "The data was deleted", "It is someone's birthday", "The finding is definitely fake"],
+      "options": ["The pattern is unlikely to be random chance", "The data was collected correctly", "The sample size was large enough", "It is someone's birthday"],
       "correct_index": 0,
       "explanation": "Below 0.05 means the result would be very unusual if nothing were really happening. That is the bar for calling a finding real."
     },
@@ -114,7 +114,7 @@
       "library": "Scikit-learn",
       "difficulty": 4,
       "question": "Scikit-learn is 'The Forecaster.' What is its headline job?",
-      "options": ["Predict what may happen next, like who might leave", "Bake a cake", "Write a novel", "Count the office chairs"],
+      "options": ["Predict what may happen next, like who might leave", "Summarize last year's headcount", "Measure training completion rates", "Bake a cake"],
       "correct_index": 0,
       "explanation": "Scikit-learn builds predictive models. It moves HR from 'turnover was 18% last year' to 'these employees may be at higher flight risk next quarter.'"
     },
@@ -123,7 +123,7 @@
       "library": "Statsmodels",
       "difficulty": 5,
       "question": "Before trusting a pay-equity finding, 'The Auditor' checks the gap after controlling for what?",
-      "options": ["Fair factors like tenure and education", "The weather forecast", "The CEO's mood that day", "The cafeteria menu"],
+      "options": ["Fair factors like tenure and education", "The total headcount", "Last year's budget", "The cafeteria menu"],
       "correct_index": 0,
       "explanation": "A real pay-equity test asks: does a salary gap remain after fair factors like tenure and education are counted? If it does, the gap is worth investigating."
     },
@@ -132,7 +132,7 @@
       "library": "General",
       "difficulty": 5,
       "question": "After you clean data (Pandas) and do the math (NumPy), what comes next in the workflow?",
-      "options": ["Show it with charts (Seaborn)", "Delete the whole file", "Print it on paper and frame it", "Mail it to Mars"],
+      "options": ["Show it with charts (Seaborn)", "Share it in a team meeting", "Save it to the HR drive", "Mail it to Mars"],
       "correct_index": 0,
       "explanation": "The order is clean, calculate, show, check, predict. Once the numbers are ready, Seaborn turns them into charts people can read."
     },
@@ -141,7 +141,7 @@
       "library": "Scikit-learn",
       "difficulty": 5,
       "question": "In a flight-risk model, what is 'feature importance'?",
-      "options": ["A ranked list of what drives attrition most", "A list of employee phone numbers", "The office Wi-Fi password", "The lunch menu"],
+      "options": ["A ranked list of what drives attrition most", "The average tenure by team", "The cost of each open role", "The lunch menu"],
       "correct_index": 0,
       "explanation": "Feature importance ranks which factors matter most in the model. It is boardroom gold because it shows which levers actually drive attrition."
     },
@@ -150,7 +150,7 @@
       "library": "Seaborn",
       "difficulty": 6,
       "question": "Why does the course say Seaborn matters so much?",
-      "options": ["Findings nobody understands change nothing", "It is the newest library", "It is free only on weekends", "It replaces the whole HR team"],
+      "options": ["Findings nobody understands change nothing", "It reduces the cost of software licenses", "It speeds up data entry", "It replaces the whole HR team"],
       "correct_index": 0,
       "explanation": "The deck's line: 'Findings that nobody understands change nothing.' Seaborn is how your analysis earns its meeting slot with leaders."
     },
@@ -159,7 +159,7 @@
       "library": "Scikit-learn",
       "difficulty": 6,
       "question": "Scikit-learn moves HR analytics from reporting the past to what?",
-      "options": ["Shaping the future", "Deleting the past", "Ignoring the data", "Writing fiction about employees"],
+      "options": ["Shaping the future", "Planning next year's hiring", "Forecasting leave requests", "Writing fiction about employees"],
       "correct_index": 0,
       "explanation": "Prediction is the point. From describing what happened to forecasting who may leave, HR shifts from historian to strategist."
     },
@@ -168,7 +168,7 @@
       "library": "Scikit-learn",
       "difficulty": 6,
       "question": "To check a model honestly, you split data into training and test sets. Why bother?",
-      "options": ["To test the model on data it never saw while learning", "To make the file larger", "To confuse the computer", "To delete half the employees"],
+      "options": ["To test the model on data it never saw while learning", "To use all the data efficiently", "To keep a backup copy of the file", "To confuse the computer"],
       "correct_index": 0,
       "explanation": "Holding out test data the model never trained on shows whether it genuinely learned or just memorized. That is honest validation."
     },
@@ -177,7 +177,7 @@
       "library": "Statsmodels",
       "difficulty": 7,
       "question": "In a pay-equity check, asking whether a salary gap remains after fair factors are counted is the job of which library?",
-      "options": ["Statsmodels", "A spreadsheet smile", "A magic 8-ball", "A fortune cookie"],
+      "options": ["Statsmodels", "A custom spreadsheet formula", "A survey of employee opinions", "A fortune cookie"],
       "correct_index": 0,
       "explanation": "Statsmodels runs that regression. By including tenure and education alongside gender, it isolates whether an unexplained gap remains."
     },
@@ -186,7 +186,7 @@
       "library": "General",
       "difficulty": 7,
       "question": "The deck's closing message: you do not need to become a programmer. You need what?",
-      "options": ["Five tools and one good question about your workforce", "A PhD in mathematics", "A brand new laptop", "A completely silent office"],
+      "options": ["Five tools and one good question about your workforce", "A larger HR team", "A yearly data audit", "A completely silent office"],
       "correct_index": 0,
       "explanation": "The whole point: you need five libraries and one good question. The tools are the means; the question is the skill."
     },
@@ -195,7 +195,7 @@
       "library": "General",
       "difficulty": 7,
       "question": "Which phrase best captures the five-library workflow taught in this course?",
-      "options": ["Clean, calculate, show, check, predict", "Sing, dance, paint, act", "Sleep, eat, repeat", "Guess, hope, pray"],
+      "options": ["Clean, calculate, show, check, predict", "Hire, train, promote, retain, exit", "Collect, store, report, review, act", "Guess, hope, pray"],
       "correct_index": 0,
       "explanation": "Clean (Pandas), calculate (NumPy), show (Seaborn), check (Statsmodels), predict (Scikit-learn). That is the through-line of the deck."
     }
