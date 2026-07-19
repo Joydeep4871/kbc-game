@@ -4,12 +4,26 @@ from __future__ import annotations
 import json
 import random
 import time
+from dataclasses import replace
 from pathlib import Path
 from typing import Optional
 
 from .models import Question
 
 TIERS = range(1, 8)  # 1..7
+
+
+def _shuffle_options(q: Question, rng: random.Random) -> Question:
+    """Return a copy with options shuffled and correct_index remapped, so the
+    correct answer is not always in the same slot. The bank authors every
+    question with the answer first; this spreads it across A/B/C/D."""
+    order = list(range(len(q.options)))
+    rng.shuffle(order)
+    return replace(
+        q,
+        options=[q.options[i] for i in order],
+        correct_index=order.index(q.correct_index),
+    )
 
 
 def load_bank(path: str | Path) -> list[Question]:
@@ -35,4 +49,6 @@ def draw_round(bank: list[Question], seed, contestant_id: Optional[str] = None) 
         if not pool:
             raise ValueError(f"Question bank has no question for difficulty tier {tier}")
         drawn.append(rng.choice(pool))
-    return drawn
+    # Shuffle after all picks so the id-selection stream (and rotation) is
+    # unchanged; only the option order within each question varies.
+    return [_shuffle_options(q, rng) for q in drawn]
