@@ -63,9 +63,9 @@ def test_fifty_fifty_removes_two_wrong(bank):
     assert lifelines.FIFTY_FIFTY in eng.state.used_lifelines
 
 
-# 3. Safe-haven floor at rung 5 -----------------------------------------------
-def test_safe_haven_floor_holds(bank):
-    # Clear rungs 1..5, then fail rung 6 -> keep HR Manager (rung 5).
+# 3. Linear end: wrong answer banks the highest rung cleared, no floor ---
+def test_linear_end_no_floor(bank):
+    # Clear rungs 1..5, then fail rung 6 -> keep only the banked rung (no floor).
     eng = GameEngine(_round(bank), seed=0)
     eng.start_round()
     for _ in range(5):
@@ -78,8 +78,7 @@ def test_safe_haven_floor_holds(bank):
     assert eng.state.final_rung == 5
     assert eng.final_designation() == "HR Manager"
 
-
-def test_below_safe_haven_no_floor(bank):
+def test_linear_end_below_midpoint(bank):
     # Fail rung 3 with only rungs 1-2 banked -> HR Assistant, no floor applied.
     eng = GameEngine(_round(bank), seed=0)
     eng.start_round()
@@ -89,6 +88,7 @@ def test_below_safe_haven_no_floor(bank):
         eng.advance()
     eng.force_wrong()
     assert eng.state.final_rung == 2
+    assert eng.final_designation() == "HR Assistant"
     assert eng.final_designation() == "HR Assistant"
 
 

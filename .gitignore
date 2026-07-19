@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.claude/
+.venv/
+venv/
+.DS_Store
+CACHEDIR.TAG
+settings.local.json

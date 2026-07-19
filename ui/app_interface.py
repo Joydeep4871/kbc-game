@@ -32,7 +32,7 @@ def ladder_rows(state: GameState) -> list[dict]:
             "rung": rung,
             "title": designations.title(rung),
             "state": row_state,
-            "safe_haven": rung == designations.SAFE_HAVEN_RUNG,
+            "safe_haven": False,
         })
     return rows
 

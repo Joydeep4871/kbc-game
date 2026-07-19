@@ -108,7 +108,9 @@ class GameEngine:
     def _end_lost(self) -> None:
         s = self.state
         s.status = "lost"
-        s.final_rung = designations.apply_safe_haven(s.banked_rung)
+        # Linear: the contestant keeps the highest rung they actually banked.
+        # No safe-haven floor, per the revised brief.
+        s.final_rung = s.banked_rung
 
     def advance(self) -> None:
         """Move to the next rung after a correct reveal. No-op if run is over."""
