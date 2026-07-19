@@ -150,21 +150,29 @@ def new_game(contestant_id: str) -> None:
     st.session_state["contestant_id"] = contestant_id
 
 
-def countdown_widget(remaining: float) -> None:
+def countdown_widget(remaining: float, running: bool) -> None:
+    """Always rendered while a rung is timed. Ticks only when running; when the
+    timer is paused it shows the frozen value in orange and starts no interval.
+    Rendered unconditionally (never swapped for another element type) so the
+    iframe cannot be left ticking after a pause."""
     secs = int(remaining)
+    color = GOLD if running else ORANGE
+    tick = "true" if running else "false"
     components.html(
         f"""
-        <div style="font:800 44px monospace;color:{GOLD};text-align:center;">
-          {secs:02d}
+        <div id="kbctimer" style="font:800 44px monospace;color:{color};text-align:center;">
+          {secs:02d}{'' if running else ' (STOPPED)'}
         </div>
         <script>
           let r = {secs};
-          const el = document.currentScript.previousElementSibling;
-          const iv = setInterval(() => {{
-            r -= 1;
-            if (r < 0) {{ clearInterval(iv); el.textContent = 'TIME UP'; el.style.color = '#B3261E'; return; }}
-            el.textContent = String(r).padStart(2,'0');
-          }}, 1000);
+          const el = document.getElementById('kbctimer');
+          if ({tick}) {{
+            const iv = setInterval(() => {{
+              r -= 1;
+              if (r < 0) {{ clearInterval(iv); el.textContent = 'TIME UP'; el.style.color = '{RED}'; return; }}
+              el.textContent = String(r).padStart(2, '0');
+            }}, 1000);
+          }}
         </script>
         """,
         height=70,
@@ -402,11 +410,8 @@ def main() -> None:
         else:
             q = s.current_question
             tp = view.timer_payload(eng)
-            if tp["timed"] and not s.revealed and tp["running"]:
-                countdown_widget(tp["remaining"])
-            elif tp["timed"] and not tp["running"] and not s.revealed:
-                st.markdown(f"<div class='kbc-title'>Timer paused: {int(tp['remaining'])}s</div>",
-                            unsafe_allow_html=True)
+            if tp["timed"] and not s.revealed:
+                countdown_widget(tp["remaining"], tp["running"])
             st.markdown(
                 f"<div class='qbox'><div class='qinner'>{q.question}</div></div>",
                 unsafe_allow_html=True)
