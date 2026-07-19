@@ -26,72 +26,113 @@ from core.game_engine import GameEngine
 from core.question_bank import draw_round, load_bank, seed_for
 from ui import app_interface as view
 
+# Gameshow palette (WWTBAM / KBC look), overriding the earlier teal deck theme.
+GOLD = "#FFD700"          # letter indicators, title, lifeline badges
+ORANGE = "#FFA500"        # lock-in fill and money-tree highlight
+GREEN = "#32CD32"         # correct reveal
+RED = "#DC143C"           # wrong reveal
+BORDER = "#8BB8E8"        # metallic light-blue box outline
+BOX_FILL = "#040914"      # near-black box fill
+LIGHT_BLUE = "#ADD8E6"    # future money-tree rungs
+WHITE = "#FFFFFF"
+BG_CENTER = "#0F1B4C"     # radial gradient centre
+BG_EDGE = "#000000"       # radial gradient edge
+FONT = '"Copperplate", "Copperplate Gothic Bold", "Trajan Pro", "Bookman Old Style", Georgia, serif'
+
+# Legacy aliases still referenced elsewhere in the module.
+BLUE = BG_CENTER
 TEAL = "#0F766E"
 CHARCOAL = "#36454F"
 ACCENT = "#E6F2F0"
-GOLD = "#D4AF37"
-BLUE = "#0B2E63"
 
-REVEAL_SUSPENSE_SECONDS = 1.6
+# The signature suspense beat before a reveal (the show stretches 2-4 seconds).
+REVEAL_SUSPENSE_SECONDS = 2.5
+
+# Elongated-hexagon "lozenge" used for question and answer boxes.
+LOZENGE = "polygon(3% 0, 97% 0, 100% 50%, 97% 100%, 3% 100%, 0 50%)"
 
 
 def inject_css() -> None:
     st.markdown(
         f"""
         <style>
-        .stApp {{ background: radial-gradient(circle at 50% 0%, {BLUE} 0%, {CHARCOAL} 100%); }}
+        .stApp {{ background: radial-gradient(ellipse at 50% 32%, {BG_CENTER} 0%, {BG_EDGE} 72%); }}
         .block-container {{ padding-top: 1rem; }}
 
         .kbc-title {{
-            color: {GOLD}; font-weight: 800; letter-spacing: 2px;
-            text-align: center; margin-bottom: 0.2rem;
+            color: {GOLD}; font-family: {FONT}; font-weight: 800; letter-spacing: 3px;
+            text-align: center; text-transform: uppercase; margin-bottom: 0.2rem;
+            text-shadow: 0 0 18px rgba(255,215,0,0.35);
         }}
-        .kbc-sub {{ color: #C9D4DC; text-align: center; font-size: 0.85rem; margin-bottom: 0.8rem; }}
+        .kbc-sub {{ color: {LIGHT_BLUE}; font-family: {FONT}; text-align: center;
+                    letter-spacing: 1px; text-transform: uppercase;
+                    font-size: 0.8rem; margin-bottom: 1rem; }}
 
-        /* Lifeline buttons, targeted by Streamlit's per-key wrapper class. */
+        /* Lifeline oval badges. */
         [class*="st-key-ll_"] button {{
-            background: linear-gradient(180deg, #1b3a6b, {BLUE}) !important;
-            color: {GOLD} !important; border: 1px solid {GOLD} !important;
-            border-radius: 24px !important; width: 100% !important;
-            min-height: 44px !important; font-weight: 700 !important;
+            background: radial-gradient(circle, #12213f 0%, {BG_EDGE} 100%) !important;
+            color: {GOLD} !important; border: 2px solid {GOLD} !important;
+            border-radius: 50% / 60% !important; width: 100% !important;
+            min-height: 54px !important; font-family: {FONT} !important;
+            font-weight: 700 !important; letter-spacing: 1px !important;
+            text-transform: uppercase !important; position: relative !important;
         }}
-        [class*="st-key-ll_"] button:disabled {{ opacity: 0.4 !important; }}
+        [class*="st-key-ll_"] button:disabled {{ opacity: 0.55 !important; color: #7a7a7a !important; }}
+        /* Red X over a used lifeline, as on the show. */
+        [class*="st-key-ll_"] button:disabled::after {{
+            content: "X"; position: absolute; inset: 0; display: flex;
+            align-items: center; justify-content: center;
+            color: {RED}; font-size: 2.2rem; font-weight: 900; opacity: 0.85;
+        }}
 
-        .stage {{ background: rgba(0,0,0,0.18); border: 1px solid rgba(212,175,55,0.35);
-                 border-radius: 14px; padding: 18px; }}
+        .stage {{ background: transparent; padding: 6px; }}
 
-        .kbc-card {{ background: {ACCENT}; color: {CHARCOAL}; border-radius: 12px;
-                     padding: 16px 20px; border-left: 6px solid {TEAL}; }}
+        .kbc-card {{ background: {BOX_FILL}; color: {WHITE}; border: 2px solid {BORDER};
+                     border-radius: 10px; padding: 16px 20px; }}
+        .kbc-card b {{ color: {GOLD}; }}
 
-        .qtext {{ color: white; font-weight: 700; font-size: 1.25rem; text-align: center;
-                  margin: 10px 0 18px 0; }}
+        /* Question box: a wide hexagon lozenge. Outer div paints the light-blue
+           outline; inner div paints the near-black fill inset by the padding. */
+        .qbox {{ background: {BORDER}; clip-path: {LOZENGE}; padding: 2px; margin: 8px 0 22px 0; }}
+        .qinner {{ background: {BOX_FILL}; clip-path: {LOZENGE}; color: {WHITE};
+                   font-family: {FONT}; font-weight: 700; font-size: 1.18rem;
+                   letter-spacing: 1px; text-transform: uppercase; text-align: center;
+                   padding: 20px 52px; }}
 
-        /* 2x2 answer board. Base look for every answer button; per-state
-           colors (selected/correct/wrong) are injected each render below. */
+        /* Answer board: same two-layer lozenge trick applied to Streamlit buttons. */
+        [class*="st-key-opt"] {{ background: {BORDER}; clip-path: {LOZENGE};
+                                 padding: 2px; margin-bottom: 12px; }}
         [class*="st-key-opt"] button {{
-            background: linear-gradient(180deg, #123a7a, {BLUE}) !important;
-            color: white !important; border: 2px solid {GOLD} !important;
-            border-radius: 14px !important; width: 100% !important; min-height: 66px !important;
-            text-align: left !important; padding: 12px 18px !important;
-            font-weight: 600 !important; font-size: 1.02rem !important; line-height: 1.3 !important;
-            white-space: normal !important;
+            clip-path: {LOZENGE} !important; background: {BOX_FILL} !important;
+            color: {WHITE} !important; border: none !important; border-radius: 0 !important;
+            width: 100% !important; min-height: 72px !important;
+            text-align: center !important; padding: 12px 40px !important;
+            font-family: {FONT} !important; font-weight: 700 !important;
+            font-size: 1.02rem !important; letter-spacing: 1px !important;
+            text-transform: uppercase !important; white-space: normal !important;
+            line-height: 1.25 !important;
         }}
-        .ans-hidden {{ min-height: 66px; }}
+        .ans-hidden {{ min-height: 76px; }}
 
-        .lockbeat {{ text-align: center; color: {GOLD}; font-weight: 800; font-size: 1.4rem;
-                     letter-spacing: 1px; margin: 14px 0; padding: 10px;
-                     border: 2px dashed {GOLD}; border-radius: 10px; }}
+        .lockbeat {{ text-align: center; color: {ORANGE}; font-family: {FONT}; font-weight: 800;
+                     font-size: 1.35rem; letter-spacing: 2px; text-transform: uppercase;
+                     margin: 14px 0; padding: 10px; border: 2px dashed {ORANGE}; border-radius: 8px; }}
 
-        .ladder-wrap {{ background: rgba(0,0,0,0.25); border-radius: 12px; padding: 12px; }}
-        .ladder-row {{ padding: 7px 12px; margin: 4px 0; border-radius: 8px;
-                       font-weight: 700; color: #DDE7E5; border: 1px solid transparent;
+        /* Money tree. Only the current rung is a glowing orange lozenge. */
+        .ladder-wrap {{ background: transparent; padding: 6px; }}
+        .ladder-title {{ color: {GOLD}; font-family: {FONT}; text-transform: uppercase;
+                         letter-spacing: 2px; text-align: center; margin-bottom: 8px; }}
+        .ladder-row {{ font-family: {FONT}; text-transform: uppercase; letter-spacing: 1px;
+                       padding: 6px 14px; margin: 5px 0; font-weight: 700;
                        display: flex; justify-content: space-between; }}
-        .ladder-current {{ background: {GOLD}; color: {BLUE}; border-color: {GOLD}; }}
-        .ladder-done {{ background: {TEAL}; color: white; }}
-        .ladder-future {{ opacity: 0.5; }}
+        .ladder-current {{ background: {ORANGE}; color: #000; clip-path: {LOZENGE};
+                           animation: kbcPulse 1.2s ease-in-out infinite; }}
+        .ladder-done {{ color: {ORANGE}; }}
+        .ladder-future {{ color: {LIGHT_BLUE}; opacity: 0.7; }}
+        @keyframes kbcPulse {{ 0%,100% {{ filter: brightness(1); }} 50% {{ filter: brightness(1.35); }} }}
 
         .endcard {{ text-align: center; padding: 24px; }}
-        .endcard h2 {{ color: {GOLD}; }}
+        .endcard h2 {{ color: {GOLD}; font-family: {FONT}; text-transform: uppercase; letter-spacing: 2px; }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -131,7 +172,7 @@ def countdown_widget(remaining: float) -> None:
 
 
 def render_ladder(state) -> None:
-    st.markdown("<div class='kbc-title' style='font-size:1rem;'>Designation Ladder</div>",
+    st.markdown("<div class='ladder-title' style='font-size:1rem;'>Designation Ladder</div>",
                  unsafe_allow_html=True)
     for row in view.ladder_rows(state):
         state_cls = row["state"]
@@ -146,9 +187,9 @@ def render_ladder(state) -> None:
 def answer_state_css(boxes) -> None:
     """Color specific answer keys by state. Injected after the base rule so it wins."""
     colors = {
-        "selected": f"background:{GOLD}!important;color:{BLUE}!important;",
-        "correct": "background:#1B8A3A!important;border-color:#1B8A3A!important;color:#fff!important;",
-        "wrong": "background:#B3261E!important;border-color:#B3261E!important;color:#fff!important;",
+        "selected": f"background:{ORANGE}!important;color:#000!important;",
+        "correct": f"background:{GREEN}!important;color:#000!important;",
+        "wrong": f"background:{RED}!important;color:#000!important;",
     }
     rules = [
         f".st-key-opt{b['index']} button{{{colors[b['box_state']]}}}"
@@ -305,8 +346,9 @@ def main() -> None:
             elif tp["timed"] and not tp["running"] and not s.revealed:
                 st.markdown(f"<div class='kbc-title'>Timer paused: {int(tp['remaining'])}s</div>",
                             unsafe_allow_html=True)
-            st.markdown(f"<div class='qtext'>Rung {s.current_rung}. {q.question}</div>",
-                        unsafe_allow_html=True)
+            st.markdown(
+                f"<div class='qbox'><div class='qinner'>Rung {s.current_rung}. {q.question}</div></div>",
+                unsafe_allow_html=True)
             render_answers(eng)
             if s.locked and not s.revealed:
                 st.markdown("<div class='lockbeat'>LOCK KIYA JAYE? &nbsp;(final answer locked)</div>",
