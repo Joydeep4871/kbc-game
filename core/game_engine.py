@@ -17,6 +17,7 @@ class GameEngine:
         round_questions: list[Question],
         seed: int = 0,
         now: Callable[[], float] = time.monotonic,
+        intro_delay: float = 0.0,
     ):
         if len(round_questions) != 7:
             raise ValueError("A round must have exactly 7 questions")
@@ -24,6 +25,9 @@ class GameEngine:
         self._rng = random.Random(seed)
         self._now = now
         self.timer: Optional[Timer] = None
+        # Grace period before a timed question's clock starts ticking, so the
+        # UI can fade the question in first. 0 keeps the old behavior.
+        self.intro_delay = intro_delay
 
     # --- round flow ---------------------------------------------------------
     def start_round(self) -> None:
@@ -37,7 +41,7 @@ class GameEngine:
         s.consulting = None
         duration = designations.TIMER_SECONDS if designations.is_timed(s.current_rung) else None
         self.timer = Timer(duration, now=self._now)
-        self.timer.start()
+        self.timer.start(delay=self.intro_delay if duration is not None else 0.0)
 
     def select(self, index: int) -> None:
         s = self.state

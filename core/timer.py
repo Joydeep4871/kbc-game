@@ -16,9 +16,11 @@ class Timer:
         self._run_start: Optional[float] = None
         self._stopped = False
 
-    def start(self) -> None:
+    def start(self, delay: float = 0.0) -> None:
+        """Begin the countdown. delay defers the actual start (e.g. while the
+        question fades in); remaining() holds at full duration until then."""
         self._accumulated = 0.0
-        self._run_start = self._now()
+        self._run_start = self._now() + delay
         self._stopped = False
 
     @property
@@ -28,13 +30,20 @@ class Timer:
     def elapsed(self) -> float:
         e = self._accumulated
         if self.running:
-            e += self._now() - self._run_start
+            # max() so a pending start delay does not count as negative elapsed.
+            e += max(0.0, self._now() - self._run_start)
         return e
 
     def pause(self) -> None:
         if self.running:
-            self._accumulated += self._now() - self._run_start
+            self._accumulated += max(0.0, self._now() - self._run_start)
             self._run_start = None
+
+    def delay_remaining(self) -> float:
+        """Seconds until a delayed start actually begins ticking (0 if started)."""
+        if self._run_start is None or self._stopped:
+            return 0.0
+        return max(0.0, self._run_start - self._now())
 
     def resume(self) -> None:
         if not self._stopped and self._run_start is None:

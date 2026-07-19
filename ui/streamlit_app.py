@@ -49,6 +49,11 @@ ACCENT = "#E6F2F0"
 # The signature suspense beat before a reveal (the show stretches 2-4 seconds).
 REVEAL_SUSPENSE_SECONDS = 2.5
 
+# How long the staged question/answer fade-in takes; the countdown on timed
+# rungs is armed only after this, so the clock starts with the full question
+# on screen (matches the show's rhythm).
+FADE_SECONDS = 3.5
+
 # Elongated-hexagon "lozenge" used for question and answer boxes.
 LOZENGE = "polygon(3% 0, 97% 0, 100% 50%, 97% 100%, 3% 100%, 0 50%)"
 
@@ -131,6 +136,8 @@ def inject_css() -> None:
         .ladder-done {{ color: {ORANGE}; }}
         .ladder-future {{ color: {LIGHT_BLUE}; opacity: 0.7; }}
         @keyframes kbcPulse {{ 0%,100% {{ filter: brightness(1); }} 50% {{ filter: brightness(1.35); }} }}
+        @keyframes kbcFadeIn {{ from {{ opacity: 0; transform: translateY(10px); }}
+                                to {{ opacity: 1; transform: none; }} }}
 
         .endcard {{ text-align: center; padding: 24px; }}
         .endcard h2 {{ color: {GOLD}; font-family: {FONT}; text-transform: uppercase; letter-spacing: 2px; }}
@@ -167,38 +174,130 @@ def new_game(contestant_id: str) -> None:
     seed = seed_for(contestant_id or "guest", counter=st.session_state.get("game_counter", 0))
     st.session_state["game_counter"] = st.session_state.get("game_counter", 0) + 1
     round_qs = draw_round(bank, seed, contestant_id or "guest")
-    eng = GameEngine(round_qs, seed=seed)
+    eng = GameEngine(round_qs, seed=seed, intro_delay=FADE_SECONDS)
     eng.start_round()
     st.session_state["engine"] = eng
     st.session_state["contestant_id"] = contestant_id
+    st.session_state.pop("animated_qid", None)
+    st.session_state.pop("last_sound", None)
 
 
-def countdown_widget(remaining: float, running: bool) -> None:
+def countdown_widget(remaining: float, running: bool, intro: float = 0.0, sound: bool = True) -> None:
     """Always rendered while a rung is timed. Ticks only when running; when the
     timer is paused it shows the frozen value in orange and starts no interval.
     Rendered unconditionally (never swapped for another element type) so the
-    iframe cannot be left ticking after a pause."""
+    iframe cannot be left ticking after a pause.
+
+    intro: seconds before the countdown (and its tick sound) starts, so the
+    clock arms only once the question has fully faded in. Audio is WebAudio,
+    synthesized in the browser: no assets, no network, silent if blocked."""
     secs = int(remaining)
     color = GOLD if running else ORANGE
-    tick = "true" if running else "false"
+    intro_ms = int(intro * 1000)
+    run = "true" if running else "false"
+    tick = "true" if (running and sound) else "false"
     components.html(
         f"""
         <div id="kbctimer" style="font:800 44px monospace;color:{color};text-align:center;">
           {secs:02d}{'' if running else ' (STOPPED)'}
         </div>
         <script>
-          let r = {secs};
           const el = document.getElementById('kbctimer');
-          if ({tick}) {{
-            const iv = setInterval(() => {{
-              r -= 1;
-              if (r < 0) {{ clearInterval(iv); el.textContent = 'TIME UP'; el.style.color = '{RED}'; return; }}
-              el.textContent = String(r).padStart(2, '0');
-            }}, 1000);
+          let ctx = null;
+          function blip(f, d, g, tp) {{
+            if (!{tick}) return;
+            try {{
+              const AC = window.AudioContext || window.webkitAudioContext;
+              ctx = ctx || new AC();
+              if (ctx.state === 'suspended') ctx.resume();
+              const t = ctx.currentTime;
+              const o = ctx.createOscillator(), v = ctx.createGain();
+              o.type = tp || 'square'; o.frequency.value = f;
+              v.gain.setValueAtTime(g, t);
+              v.gain.exponentialRampToValueAtTime(0.001, t + d);
+              o.connect(v); v.connect(ctx.destination);
+              o.start(t); o.stop(t + d);
+            }} catch (e) {{}}
           }}
+          // Wall-clock deadline, not a decrement chain: stays correct if the
+          // tab throttles timers and fires them in a burst.
+          const deadline = Date.now() + {intro_ms} + {secs} * 1000;
+          let shownLast = {secs};
+          function loop() {{
+            const shown = Math.min({secs}, Math.max(-1, Math.ceil((deadline - Date.now()) / 1000)));
+            if (shown !== shownLast) {{
+              shownLast = shown;
+              if (shown < 0) {{
+                el.textContent = 'TIME UP'; el.style.color = '{RED}';
+                blip(160, 0.7, 0.3, 'sawtooth');
+                return;
+              }}
+              el.textContent = String(shown).padStart(2, '0');
+              if (shown <= 10) {{
+                el.style.color = '{RED}';
+                blip(1250, 0.05, 0.14); blip(90, 0.09, 0.22, 'sine');
+              }} else {{
+                blip(950, 0.04, 0.08);
+              }}
+            }}
+            if (shown >= 0) setTimeout(loop, 200);
+          }}
+          if ({run}) loop();
         </script>
         """,
         height=70,
+    )
+
+
+def question_entrance(state) -> None:
+    """Stagger-fade the question box and the four answers, once per question.
+    Reruns of the same question skip the animation so it never replays."""
+    qid = state.current_question.id
+    if st.session_state.get("animated_qid") == qid:
+        return
+    st.session_state["animated_qid"] = qid
+    rules = [".qbox{opacity:0;animation:kbcFadeIn .8s ease .15s forwards}"]
+    for i in range(4):
+        rules.append(
+            f".st-key-opt{i}{{opacity:0;animation:kbcFadeIn .7s ease {1.0 + 0.6 * i:.1f}s forwards}}"
+        )
+    st.markdown("<style>" + "".join(rules) + "</style>", unsafe_allow_html=True)
+
+
+def play_sound(kind: str) -> None:
+    """Fire-and-forget WebAudio phrase: 'correct' (rising arpeggio), 'wrong'
+    (falling tone), 'win' (fanfare). KBC-inspired, synthesized, no assets."""
+    notes = {
+        "correct": [(523, 0.0, 0.4), (659, 0.1, 0.4), (784, 0.2, 0.4), (1047, 0.32, 0.9)],
+        "wrong": [(233, 0.0, 0.4), (196, 0.32, 0.4), (147, 0.64, 1.0)],
+        "win": [(262, 0.0, 0.45), (330, 0.0, 0.45), (392, 0.0, 0.45),
+                (349, 0.4, 0.45), (440, 0.4, 0.45), (523, 0.4, 0.45),
+                (392, 0.8, 0.45), (494, 0.8, 0.45), (587, 0.8, 0.45),
+                (523, 1.25, 1.8), (659, 1.25, 1.8), (784, 1.25, 1.8), (1047, 1.25, 1.8)],
+    }[kind]
+    wave = "triangle" if kind == "wrong" else "sine"
+    seq = ",".join(f"[{f},{t},{d}]" for f, t, d in notes)
+    components.html(
+        f"""
+        <script>
+          try {{
+            const AC = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AC();
+            if (ctx.state === 'suspended') ctx.resume();
+            const t0 = ctx.currentTime + 0.05;
+            for (const [f, t, d] of [{seq}]) {{
+              const o = ctx.createOscillator(), v = ctx.createGain();
+              o.type = '{wave}'; o.frequency.value = f;
+              v.gain.setValueAtTime(0, t0 + t);
+              v.gain.linearRampToValueAtTime(0.2, t0 + t + 0.03);
+              v.gain.exponentialRampToValueAtTime(0.001, t0 + t + d);
+              o.connect(v); v.connect(ctx.destination);
+              o.start(t0 + t); o.stop(t0 + t + d);
+            }}
+          }} catch (e) {{}}
+        </script>
+        """,
+        height=0,
     )
 
 
@@ -335,6 +434,7 @@ def render_lifelines(eng) -> None:
 
 def render_host_panel(eng) -> None:
     st.sidebar.markdown("### Host Control")
+    st.sidebar.toggle("Sound", value=True, key="sound_on")
     s = eng.state
     if st.sidebar.button("Next question",
                          disabled=not (s.revealed and s.last_correct and s.status == "running")):
@@ -468,7 +568,8 @@ def render_landing() -> None:
 
 
 def main() -> None:
-    st.set_page_config(page_title="Kaun Banega CHRO", layout="wide")
+    st.set_page_config(page_title="Kaun Banega CHRO", layout="wide",
+                       initial_sidebar_state="expanded")
     inject_css()
 
     if "engine" not in st.session_state:
@@ -493,6 +594,12 @@ def main() -> None:
 
     with play:
         st.markdown("<div class='stage'>", unsafe_allow_html=True)
+        if s.revealed and st.session_state.get("sound_on", True):
+            outcome = "win" if s.status == "won" else ("correct" if s.last_correct else "wrong")
+            sound_key = f"{s.current_question.id}:{outcome}"
+            if st.session_state.get("last_sound") != sound_key:
+                st.session_state["last_sound"] = sound_key
+                play_sound(outcome)
         if s.status == "won":
             win_celebration()
             render_explanation(eng)
@@ -511,9 +618,15 @@ def main() -> None:
                 st.rerun()
         else:
             q = s.current_question
+            if not s.revealed:
+                question_entrance(s)
             tp = view.timer_payload(eng)
             if tp["timed"] and not s.revealed:
-                countdown_widget(tp["remaining"], tp["running"])
+                countdown_widget(
+                    tp["remaining"], tp["running"],
+                    intro=eng.timer.delay_remaining() if eng.timer else 0.0,
+                    sound=st.session_state.get("sound_on", True),
+                )
             st.markdown(
                 f"<div class='qbox'><div class='qinner'>{q.question}</div></div>",
                 unsafe_allow_html=True)
