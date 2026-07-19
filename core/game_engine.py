@@ -44,6 +44,9 @@ class GameEngine:
         if s.revealed or s.locked or index in s.removed_options:
             return
         s.selected_index = index
+        # Committing an answer stops the clock, like locking in a final answer.
+        if self.timer:
+            self.timer.pause()
 
     def lock(self) -> None:
         """Final-answer lock. Freezes the answer and pauses the timer for the reveal beat."""

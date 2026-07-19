@@ -171,6 +171,69 @@ def countdown_widget(remaining: float) -> None:
     )
 
 
+def win_celebration() -> None:
+    """Self-contained confetti burst, marquee lights, and a glowing CHRO title."""
+    components.html(
+        """
+        <div id="cel">
+          <canvas id="cfx"></canvas>
+          <div class="marquee"></div>
+          <div class="wrap">
+            <div class="crown">CHRO</div>
+            <div class="tag">TOP OF THE LADDER</div>
+            <div class="sub">You became Chief Human Resources Officer</div>
+          </div>
+        </div>
+        <style>
+          #cel{position:relative;height:300px;overflow:hidden;border-radius:14px;
+               background:radial-gradient(ellipse at 50% 28%,#12225a 0%,#000 75%);}
+          #cfx{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
+          .wrap{position:relative;z-index:2;text-align:center;padding-top:72px;
+                font-family:"Copperplate","Trajan Pro","Bookman Old Style",Georgia,serif;}
+          .crown{font-size:76px;font-weight:900;letter-spacing:8px;color:#FFD700;
+                 text-transform:uppercase;animation:glow 1.1s ease-in-out infinite;}
+          .tag{font-size:26px;letter-spacing:6px;color:#FFA500;text-transform:uppercase;margin-top:4px;}
+          .sub{color:#ADD8E6;letter-spacing:2px;text-transform:uppercase;font-size:12px;margin-top:12px;}
+          @keyframes glow{0%,100%{text-shadow:0 0 12px #FFD700,0 0 24px #FFA500;}
+                          50%{text-shadow:0 0 28px #FFFFFF,0 0 52px #FFD700;}}
+          .marquee{position:absolute;inset:6px;border-radius:12px;z-index:1;pointer-events:none;
+                   background:
+                     repeating-linear-gradient(90deg,#FFD700 0 8px,transparent 8px 34px) top/100% 7px no-repeat,
+                     repeating-linear-gradient(90deg,#FFD700 0 8px,transparent 8px 34px) bottom/100% 7px no-repeat,
+                     repeating-linear-gradient(0deg,#FFD700 0 8px,transparent 8px 34px) left/7px 100% no-repeat,
+                     repeating-linear-gradient(0deg,#FFD700 0 8px,transparent 8px 34px) right/7px 100% no-repeat;
+                   animation:blink .5s steps(2) infinite;opacity:.8;}
+          @keyframes blink{50%{opacity:.22;}}
+        </style>
+        <script>
+          const c=document.getElementById('cfx'),x=c.getContext('2d');
+          function rz(){c.width=c.offsetWidth;c.height=c.offsetHeight;}rz();
+          const cols=['#FFD700','#FFA500','#32CD32','#8BB8E8','#FFFFFF','#DC143C'];
+          let P=[];
+          function burst(n){for(let i=0;i<n;i++){P.push({
+            x:c.width/2,y:c.height/3,vx:(Math.random()-.5)*11,vy:Math.random()*-10-2,
+            g:.18+Math.random()*.12,s:4+Math.random()*5,col:cols[i%cols.length],
+            rot:Math.random()*6,vr:(Math.random()-.5)*.4});}}
+          function rain(){P.push({x:Math.random()*c.width,y:-10,vx:(Math.random()-.5)*2,
+            vy:2+Math.random()*3,g:.03,s:4+Math.random()*4,
+            col:cols[Math.floor(Math.random()*cols.length)],rot:Math.random()*6,vr:(Math.random()-.5)*.3});}
+          burst(180);
+          let t=0;
+          function loop(){x.clearRect(0,0,c.width,c.height);
+            if(t<240&&t%3==0)rain();t++;
+            P.forEach(p=>{p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+              x.save();x.translate(p.x,p.y);x.rotate(p.rot);
+              x.fillStyle=p.col;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*1.6);x.restore();});
+            P=P.filter(p=>p.y<c.height+20);
+            requestAnimationFrame(loop);}
+          loop();
+          window.addEventListener('resize',rz);
+        </script>
+        """,
+        height=312,
+    )
+
+
 def render_ladder(state) -> None:
     st.markdown("<div class='ladder-title' style='font-size:1rem;'>Designation Ladder</div>",
                  unsafe_allow_html=True)
@@ -321,9 +384,7 @@ def main() -> None:
     with play:
         st.markdown("<div class='stage'>", unsafe_allow_html=True)
         if s.status == "won":
-            st.markdown("<div class='endcard'><h2>CHRO. Top of the ladder.</h2>"
-                        "<p>You became Chief Human Resources Officer.</p></div>",
-                        unsafe_allow_html=True)
+            win_celebration()
             render_explanation(eng)
             if st.button("Play again"):
                 new_game(st.session_state.get("contestant_id", "guest"))
@@ -347,7 +408,7 @@ def main() -> None:
                 st.markdown(f"<div class='kbc-title'>Timer paused: {int(tp['remaining'])}s</div>",
                             unsafe_allow_html=True)
             st.markdown(
-                f"<div class='qbox'><div class='qinner'>Rung {s.current_rung}. {q.question}</div></div>",
+                f"<div class='qbox'><div class='qinner'>{q.question}</div></div>",
                 unsafe_allow_html=True)
             render_answers(eng)
             if s.locked and not s.revealed:
