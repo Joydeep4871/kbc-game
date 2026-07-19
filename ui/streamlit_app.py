@@ -405,7 +405,7 @@ def build_logo_svg() -> str:
         for y in (224, 206, 188)
     )
     star = _star_path(200, 158, 19, 8)
-    return f"""
+    svg = f"""
     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kaun Banega CHRO">
       <defs>
         <path id="arcTop" d="M 66,200 A 134,134 0 0 1 334,200" fill="none"/>
@@ -441,6 +441,9 @@ def build_logo_svg() -> str:
       </text>
     </svg>
     """
+    # Streamlit runs markdown first; a blank line or 4-space indent would break
+    # the HTML block. Collapse to one contiguous line with no blank lines.
+    return "".join(line.strip() for line in svg.splitlines() if line.strip())
 
 
 def render_landing() -> None:
