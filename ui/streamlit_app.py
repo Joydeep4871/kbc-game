@@ -9,6 +9,7 @@ Run: streamlit run ui/streamlit_app.py
 
 from __future__ import annotations
 
+import math
 import sys
 import time
 from pathlib import Path
@@ -133,6 +134,28 @@ def inject_css() -> None:
 
         .endcard {{ text-align: center; padding: 24px; }}
         .endcard h2 {{ color: {GOLD}; font-family: {FONT}; text-transform: uppercase; letter-spacing: 2px; }}
+
+        /* Landing screen. */
+        .kbc-logo {{ text-align: center; margin: 2px 0 4px 0; }}
+        .kbc-logo svg {{ width: min(340px, 68vw); height: auto;
+                         animation: kbcHalo 4s ease-in-out infinite; }}
+        @keyframes kbcHalo {{ 0%,100% {{ filter: drop-shadow(0 0 16px rgba(255,215,0,0.30)); }}
+                              50% {{ filter: drop-shadow(0 0 34px rgba(255,165,0,0.55)); }} }}
+        .flavor {{ text-align: center; color: {LIGHT_BLUE}; font-family: {FONT};
+                   text-transform: uppercase; letter-spacing: 2px; line-height: 1.75;
+                   font-size: 0.86rem; margin: 8px auto 20px auto; max-width: 620px; }}
+        .flavor .big {{ color: {GOLD}; font-size: 1.15rem; display: block; margin-bottom: 8px;
+                        text-shadow: 0 0 16px rgba(255,215,0,0.4); }}
+        .flavor .cue {{ color: {ORANGE}; display: block; margin-top: 10px; letter-spacing: 3px; }}
+        .landing-hint {{ text-align: center; color: #9fb3c8; font-family: {FONT};
+                         text-transform: uppercase; letter-spacing: 1px; font-size: 0.72rem;
+                         margin: 6px 0 2px 0; }}
+        [class*="st-key-startbtn"] button {{
+            background: linear-gradient(180deg, {GOLD}, {ORANGE}) !important; color: #0B1B3A !important;
+            border: 2px solid {GOLD} !important; border-radius: 30px !important; min-height: 56px !important;
+            font-family: {FONT} !important; font-weight: 800 !important; letter-spacing: 2px !important;
+            text-transform: uppercase !important; box-shadow: 0 0 22px rgba(255,215,0,0.4) !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -362,20 +385,95 @@ def render_explanation(eng) -> None:
     )
 
 
+def build_logo_svg() -> str:
+    """An original KBC-style emblem: concentric gold/blue rings, a ring of
+    question marks, a globe centre, and arced 'KAUN BANEGA' / 'CHRO' wording."""
+    marks = []
+    n = 16
+    for i in range(n):
+        a = (i / n) * 2 * math.pi - math.pi / 2
+        x = 200 + 118 * math.cos(a)
+        y = 200 + 118 * math.sin(a)
+        rot = math.degrees(a) + 90
+        marks.append(
+            f'<text x="{x:.1f}" y="{y:.1f}" font-size="17" fill="#32CD32" font-weight="900" '
+            f'text-anchor="middle" dominant-baseline="central" '
+            f'transform="rotate({rot:.1f} {x:.1f} {y:.1f})">?</text>'
+        )
+    rays = []
+    for i in range(28):
+        a = (i / 28) * 2 * math.pi
+        x1, y1 = 200 + 40 * math.cos(a), 200 + 40 * math.sin(a)
+        x2, y2 = 200 + 86 * math.cos(a), 200 + 86 * math.sin(a)
+        rays.append(
+            f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
+            f'stroke="#FFD700" stroke-width="1.3" opacity="0.45"/>'
+        )
+    return f"""
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kaun Banega CHRO">
+      <defs>
+        <path id="arcTop" d="M 70,200 A 130,130 0 0 1 330,200" fill="none"/>
+        <path id="arcBot" d="M 330,200 A 130,130 0 0 1 70,200" fill="none"/>
+        <radialGradient id="globe" cx="50%" cy="38%" r="70%">
+          <stop offset="0%" stop-color="#1b3f8f"/><stop offset="100%" stop-color="#050b1e"/>
+        </radialGradient>
+      </defs>
+      <circle cx="200" cy="200" r="160" fill="#040914" stroke="#FFD700" stroke-width="6"/>
+      <circle cx="200" cy="200" r="150" fill="none" stroke="#6CA6CD" stroke-width="2"/>
+      <circle cx="200" cy="200" r="138" fill="none" stroke="#FFA500" stroke-width="1.2" opacity="0.7"/>
+      {''.join(marks)}
+      <circle cx="200" cy="200" r="100" fill="url(#globe)" stroke="#FFD700" stroke-width="2.5"/>
+      <ellipse cx="200" cy="200" rx="100" ry="42" fill="none" stroke="#6CA6CD" stroke-width="1" opacity="0.45"/>
+      <ellipse cx="200" cy="200" rx="100" ry="74" fill="none" stroke="#6CA6CD" stroke-width="1" opacity="0.35"/>
+      <ellipse cx="200" cy="200" rx="42" ry="100" fill="none" stroke="#6CA6CD" stroke-width="1" opacity="0.35"/>
+      <line x1="100" y1="200" x2="300" y2="200" stroke="#6CA6CD" stroke-width="1" opacity="0.45"/>
+      {''.join(rays)}
+      <text x="200" y="214" font-size="62" fill="#FFD700" font-weight="900" text-anchor="middle"
+            font-family='Copperplate, "Trajan Pro", Georgia, serif'>?</text>
+      <text font-size="30" fill="#FFD700" font-weight="800" letter-spacing="3"
+            font-family='Copperplate, "Trajan Pro", Georgia, serif'>
+        <textPath href="#arcTop" startOffset="50%" text-anchor="middle">KAUN BANEGA</textPath>
+      </text>
+      <text font-size="34" fill="#FFA500" font-weight="800" letter-spacing="8"
+            font-family='Copperplate, "Trajan Pro", Georgia, serif'>
+        <textPath href="#arcBot" startOffset="50%" text-anchor="middle">CHRO</textPath>
+      </text>
+    </svg>
+    """
+
+
+def render_landing() -> None:
+    st.markdown(f"<div class='kbc-logo'>{build_logo_svg()}</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='flavor'>"
+        "<span class='big'>Seven questions stand between you and the corner office.</span>"
+        "Climb the ladder from HR Intern to Chief Human Resources Officer, "
+        "one right answer at a time. Three lifelines. One hot seat. No second chances."
+        "<span class='cue'>Lock kiya jaye?</span>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    left, mid, right = st.columns([1, 2, 1])
+    with mid:
+        st.markdown("<div class='landing-hint'>Take the hot seat</div>", unsafe_allow_html=True)
+        cid = st.text_input("Contestant id", value="contestant-1", label_visibility="collapsed",
+                            placeholder="Contestant id")
+        if st.button("Start game", key="startbtn", use_container_width=True):
+            new_game(cid)
+            st.rerun()
+
+
 def main() -> None:
     st.set_page_config(page_title="Kaun Banega CHRO", layout="wide")
     inject_css()
+
+    if "engine" not in st.session_state:
+        render_landing()
+        return
+
     st.markdown("<h1 class='kbc-title'>Kaun Banega CHRO</h1>", unsafe_allow_html=True)
     st.markdown("<div class='kbc-sub'>Who will become Chief Human Resources Officer?</div>",
                 unsafe_allow_html=True)
-
-    if "engine" not in st.session_state:
-        st.write("Enter a contestant id and start the hot seat.")
-        cid = st.text_input("Contestant id", value="contestant-1")
-        if st.button("Start game"):
-            new_game(cid)
-            st.rerun()
-        return
 
     eng = st.session_state["engine"]
     s = eng.state
