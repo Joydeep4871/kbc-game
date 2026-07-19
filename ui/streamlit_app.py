@@ -418,8 +418,8 @@ def build_logo_svg() -> str:
       </defs>
       <circle cx="200" cy="200" r="162" fill="#040914" stroke="#FFD700" stroke-width="7"/>
       <circle cx="200" cy="200" r="153" fill="url(#fld)"/>
-      <circle cx="200" cy="200" r="120" fill="none" stroke="#FFD700" stroke-width="2"/>
-      <circle cx="200" cy="200" r="112" fill="url(#fld)" stroke="#6CA6CD" stroke-width="1" opacity="0.55"/>
+      <circle cx="200" cy="200" r="108" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <circle cx="200" cy="200" r="100" fill="url(#fld)" stroke="#6CA6CD" stroke-width="1" opacity="0.55"/>
 
       <g fill="#FFD700">
         <path d="M56,200 l9,-9 l9,9 l-9,9 Z"/>
@@ -433,10 +433,10 @@ def build_logo_svg() -> str:
       {rungs}
       <path d="{star}" fill="#FFD700" stroke="#FFA500" stroke-width="1"/>
 
-      <text font-size="30" fill="#FFD700" font-weight="800" letter-spacing="4" font-family="{fnt}">
+      <text font-size="23" fill="#FFD700" font-weight="800" letter-spacing="3" font-family="{fnt}" dominant-baseline="central">
         <textPath href="#arcTop" startOffset="50%" text-anchor="middle">KAUN BANEGA</textPath>
       </text>
-      <text font-size="30" fill="#FFD700" font-weight="800" letter-spacing="12" font-family="{fnt}">
+      <text font-size="23" fill="#FFD700" font-weight="800" letter-spacing="10" font-family="{fnt}" dominant-baseline="central">
         <textPath href="#arcBot" startOffset="50%" text-anchor="middle">CHRO</textPath>
       </text>
     </svg>
