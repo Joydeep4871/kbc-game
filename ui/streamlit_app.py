@@ -385,57 +385,58 @@ def render_explanation(eng) -> None:
     )
 
 
+def _star_path(cx: float, cy: float, outer: float, inner: float, n: int = 5, rot_deg: float = -90) -> str:
+    pts = []
+    for i in range(2 * n):
+        r = outer if i % 2 == 0 else inner
+        a = math.radians(rot_deg) + i * math.pi / n
+        pts.append(f"{cx + r * math.cos(a):.1f},{cy + r * math.sin(a):.1f}")
+    return "M" + " L".join(pts) + " Z"
+
+
 def build_logo_svg() -> str:
-    """An original KBC-style emblem: concentric gold/blue rings, a ring of
-    question marks, a globe centre, and arced 'KAUN BANEGA' / 'CHRO' wording."""
-    marks = []
-    n = 16
-    for i in range(n):
-        a = (i / n) * 2 * math.pi - math.pi / 2
-        x = 200 + 118 * math.cos(a)
-        y = 200 + 118 * math.sin(a)
-        rot = math.degrees(a) + 90
-        marks.append(
-            f'<text x="{x:.1f}" y="{y:.1f}" font-size="17" fill="#32CD32" font-weight="900" '
-            f'text-anchor="middle" dominant-baseline="central" '
-            f'transform="rotate({rot:.1f} {x:.1f} {y:.1f})">?</text>'
-        )
-    rays = []
-    for i in range(28):
-        a = (i / 28) * 2 * math.pi
-        x1, y1 = 200 + 40 * math.cos(a), 200 + 40 * math.sin(a)
-        x2, y2 = 200 + 86 * math.cos(a), 200 + 86 * math.sin(a)
-        rays.append(
-            f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" '
-            f'stroke="#FFD700" stroke-width="1.3" opacity="0.45"/>'
-        )
+    """Original KBC-style crest: twin gold rings on a deep navy field, arced
+    'KAUN BANEGA' / 'CHRO' wording, side studs, and a gold ladder rising to a
+    star at the centre (climb to the top job). Clean, no clutter."""
+    fnt = "Copperplate, 'Trajan Pro', Georgia, serif"
+    # Ladder: two rails with rungs, rising to a star.
+    rungs = "".join(
+        f'<line x1="187" y1="{y}" x2="213" y2="{y}" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>'
+        for y in (224, 206, 188)
+    )
+    star = _star_path(200, 158, 19, 8)
     return f"""
     <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kaun Banega CHRO">
       <defs>
-        <path id="arcTop" d="M 70,200 A 130,130 0 0 1 330,200" fill="none"/>
-        <path id="arcBot" d="M 330,200 A 130,130 0 0 1 70,200" fill="none"/>
-        <radialGradient id="globe" cx="50%" cy="38%" r="70%">
-          <stop offset="0%" stop-color="#1b3f8f"/><stop offset="100%" stop-color="#050b1e"/>
+        <path id="arcTop" d="M 66,200 A 134,134 0 0 1 334,200" fill="none"/>
+        <path id="arcBot" d="M 66,200 A 134,134 0 0 0 334,200" fill="none"/>
+        <radialGradient id="fld" cx="50%" cy="42%" r="72%">
+          <stop offset="0%" stop-color="#1b3f8f"/>
+          <stop offset="68%" stop-color="#0a1740"/>
+          <stop offset="100%" stop-color="#050b1e"/>
         </radialGradient>
       </defs>
-      <circle cx="200" cy="200" r="160" fill="#040914" stroke="#FFD700" stroke-width="6"/>
-      <circle cx="200" cy="200" r="150" fill="none" stroke="#6CA6CD" stroke-width="2"/>
-      <circle cx="200" cy="200" r="138" fill="none" stroke="#FFA500" stroke-width="1.2" opacity="0.7"/>
-      {''.join(marks)}
-      <circle cx="200" cy="200" r="100" fill="url(#globe)" stroke="#FFD700" stroke-width="2.5"/>
-      <ellipse cx="200" cy="200" rx="100" ry="42" fill="none" stroke="#6CA6CD" stroke-width="1" opacity="0.45"/>
-      <ellipse cx="200" cy="200" rx="100" ry="74" fill="none" stroke="#6CA6CD" stroke-width="1" opacity="0.35"/>
-      <ellipse cx="200" cy="200" rx="42" ry="100" fill="none" stroke="#6CA6CD" stroke-width="1" opacity="0.35"/>
-      <line x1="100" y1="200" x2="300" y2="200" stroke="#6CA6CD" stroke-width="1" opacity="0.45"/>
-      {''.join(rays)}
-      <text x="200" y="214" font-size="62" fill="#FFD700" font-weight="900" text-anchor="middle"
-            font-family='Copperplate, "Trajan Pro", Georgia, serif'>?</text>
-      <text font-size="30" fill="#FFD700" font-weight="800" letter-spacing="3"
-            font-family='Copperplate, "Trajan Pro", Georgia, serif'>
+      <circle cx="200" cy="200" r="162" fill="#040914" stroke="#FFD700" stroke-width="7"/>
+      <circle cx="200" cy="200" r="153" fill="url(#fld)"/>
+      <circle cx="200" cy="200" r="120" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <circle cx="200" cy="200" r="112" fill="url(#fld)" stroke="#6CA6CD" stroke-width="1" opacity="0.55"/>
+
+      <g fill="#FFD700">
+        <path d="M56,200 l9,-9 l9,9 l-9,9 Z"/>
+        <path d="M326,200 l9,-9 l9,9 l-9,9 Z"/>
+      </g>
+
+      <g stroke="#FFD700" fill="none">
+        <line x1="189" y1="176" x2="189" y2="236" stroke-width="4" stroke-linecap="round"/>
+        <line x1="211" y1="176" x2="211" y2="236" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      {rungs}
+      <path d="{star}" fill="#FFD700" stroke="#FFA500" stroke-width="1"/>
+
+      <text font-size="30" fill="#FFD700" font-weight="800" letter-spacing="4" font-family="{fnt}">
         <textPath href="#arcTop" startOffset="50%" text-anchor="middle">KAUN BANEGA</textPath>
       </text>
-      <text font-size="34" fill="#FFA500" font-weight="800" letter-spacing="8"
-            font-family='Copperplate, "Trajan Pro", Georgia, serif'>
+      <text font-size="30" fill="#FFD700" font-weight="800" letter-spacing="12" font-family="{fnt}">
         <textPath href="#arcBot" startOffset="50%" text-anchor="middle">CHRO</textPath>
       </text>
     </svg>
