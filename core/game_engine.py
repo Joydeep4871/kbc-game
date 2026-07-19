@@ -46,9 +46,11 @@ class GameEngine:
         s.selected_index = index
 
     def lock(self) -> None:
-        """Final-answer lock. Required before a natural reveal."""
+        """Final-answer lock. Freezes the answer and pauses the timer for the reveal beat."""
         if self.state.selected_index is not None and not self.state.revealed:
             self.state.locked = True
+            if self.timer:
+                self.timer.pause()
 
     # --- lifelines ----------------------------------------------------------
     def apply_lifeline(self, name: str) -> None:
