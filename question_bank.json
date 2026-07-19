@@ -1,0 +1,256 @@
+{
+  "meta": {
+    "game": "Kaun Banega CHRO (KBC)",
+    "source_materials": [
+      "Claude/Projects/AIHR/build_deck.js (16-slide teaching deck)",
+      "https://www.aihr.com/blog/hr-data-analytics/ (AIHR: 5 Python Libraries You Need in HR)"
+    ],
+    "library_order_workflow": ["Pandas", "NumPy", "Seaborn", "Statsmodels", "Scikit-learn"],
+    "mnemonic": "clean, calculate, show, check, predict",
+    "difficulty_scale": "1 (easiest) to 7 (hardest); the ladder picks one question per tier so difficulty ramps with the round",
+    "note": "Seed bank only. Expand freely; the engine rotates by seeding on contestant id so no two contestants get the same round."
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "library": "Pandas",
+      "difficulty": 1,
+      "question": "In the deck, which library is nicknamed 'The Organizer'?",
+      "options": ["Pandas", "NumPy", "Seaborn", "Statsmodels"],
+      "correct_index": 0,
+      "explanation": "Pandas is 'The Organizer'. It loads, cleans, and analyzes tabular HR exports from an HRIS, ATS, or payroll system. Its main structure is the DataFrame, a smarter spreadsheet you command with code.",
+      "code": "df = pd.read_csv('hr_export.csv')"
+    },
+    {
+      "id": "q02",
+      "library": "General",
+      "difficulty": 1,
+      "question": "The deck's mnemonic is 'clean, calculate, show, check, predict'. Which library does 'show' refer to?",
+      "options": ["Pandas", "NumPy", "Seaborn", "Scikit-learn"],
+      "correct_index": 2,
+      "explanation": "Seaborn is 'The Illustrator' and maps to 'show'. It turns workforce data into charts leaders can read, like box plots and heatmaps. Clean = Pandas, calculate = NumPy, check = Statsmodels, predict = Scikit-learn."
+    },
+    {
+      "id": "q03",
+      "library": "Pandas",
+      "difficulty": 1,
+      "question": "What is the name of Pandas' main data structure, the thing that holds your HR table in memory?",
+      "options": ["DataFrame", "Array", "Tuple", "List"],
+      "correct_index": 0,
+      "explanation": "A DataFrame is Pandas' core structure: rows and columns like a spreadsheet, but you filter, group, merge, and calculate against it with short readable code."
+    },
+    {
+      "id": "q04",
+      "library": "NumPy",
+      "difficulty": 2,
+      "question": "Which library does the deck call 'The Calculator', the math engine that Pandas is built on top of?",
+      "options": ["Seaborn", "NumPy", "Statsmodels", "Scikit-learn"],
+      "correct_index": 1,
+      "explanation": "NumPy (Numerical Python) is 'The Calculator'. When you run a Pandas calculation, NumPy often does the math underneath. It handles fast, reliable math on arrays of numbers."
+    },
+    {
+      "id": "q05",
+      "library": "Pandas",
+      "difficulty": 2,
+      "question": "Which one line computes the overall attrition rate as a percentage in Pandas?",
+      "options": [
+        "df['Attrition'].value_counts(normalize=True) * 100",
+        "df.groupby('Department').mean()",
+        "np.percentile(df['MonthlyIncome'], 50)",
+        "sns.boxplot(x='Attrition', y='MonthlyIncome', data=df)"
+      ],
+      "correct_index": 0,
+      "explanation": "df['Attrition'].value_counts(normalize=True) * 100 counts Yes/No shares and scales to a percentage. That is your overall attrition rate, the starting point for any turnover analysis."
+    },
+    {
+      "id": "q06",
+      "library": "General",
+      "difficulty": 2,
+      "question": "According to the deck, why is Excel a weak starting point for HR analytics?",
+      "options": [
+        "It cannot open more than 100 rows",
+        "It slows on large datasets, lacks practical machine learning, and charts need manual cleanup",
+        "It cannot compute averages",
+        "It is not free"
+      ],
+      "correct_index": 1,
+      "explanation": "Excel is a fine start but taps out: it slows on large workforce exports, machine learning is out of practical reach, and charts need manual cleanup before sharing. Python removes those limits."
+    },
+    {
+      "id": "q07",
+      "library": "Pandas",
+      "difficulty": 3,
+      "question": "Which Pandas method groups rows by a column, for example to compare attrition by department?",
+      "options": ["fillna()", "groupby()", "describe()", "merge()"],
+      "correct_index": 1,
+      "explanation": "groupby() groups rows by a column. df.groupby('Department')['Attrition'].mean() gives the attrition rate per department. fillna fills blanks, describe summarizes, merge joins tables."
+    },
+    {
+      "id": "q08",
+      "library": "NumPy",
+      "difficulty": 3,
+      "question": "To get the 25th, 50th, and 75th percentile of employee salaries, which NumPy call do you use?",
+      "options": [
+        "np.var(df['MonthlyIncome'], ddof=1)",
+        "np.array(df['Gender'])",
+        "np.percentile(df['MonthlyIncome'], [25, 50, 75])",
+        "np.mean(df['MonthlyIncome'])"
+      ],
+      "correct_index": 2,
+      "explanation": "np.percentile(df['MonthlyIncome'], [25, 50, 75]) returns instant salary benchmarks. The deck shows this as NumPy's 'Calculator' role: fast, reliable workforce math."
+    },
+    {
+      "id": "q09",
+      "library": "General",
+      "difficulty": 3,
+      "question": "NumPy is best described as what kind of tool?",
+      "options": [
+        "A charting library built on Matplotlib",
+        "A library for fast math on arrays of numbers",
+        "A machine learning model trainer",
+        "A spreadsheet application"
+      ],
+      "correct_index": 1,
+      "explanation": "NumPy is a library for fast math on arrays of numbers. Like the engine in a car: not glamorous, but nothing moves without it. It keeps Pandas' calculations fast and accurate."
+    },
+    {
+      "id": "q10",
+      "library": "Statsmodels",
+      "difficulty": 4,
+      "question": "Statsmodels is nicknamed 'The Auditor' because it provides what that makes HR findings defensible?",
+      "options": [
+        "Pretty charts for the boardroom",
+        "p-values, confidence intervals, and regression outputs",
+        "A faster way to clean data",
+        "Predictions of who will leave"
+      ],
+      "correct_index": 1,
+      "explanation": "Statsmodels gives p-values, confidence intervals, and regression output. That turns 'this looks like a gap' into 'this is a gap, and here is the proof', the evidence that stands up to finance, legal, or a regulator."
+    },
+    {
+      "id": "q11",
+      "library": "Seaborn",
+      "difficulty": 4,
+      "question": "Seaborn is built on top of which lower level plotting library?",
+      "options": ["Matplotlib", "Pandas", "NumPy", "TensorFlow"],
+      "correct_index": 0,
+      "explanation": "Seaborn is built on Matplotlib. Matplotlib gives full control but needs lots of code; Seaborn focuses on statistical charts and produces clean output with far less effort."
+    },
+    {
+      "id": "q12",
+      "library": "Scikit-learn",
+      "difficulty": 4,
+      "question": "Scikit-learn moves HR analytics from 'turnover was 18% last year' to what kind of statement?",
+      "options": [
+        "A pivot table of salaries",
+        "These employees may be more likely to leave next quarter",
+        "A cleaned HRIS export",
+        "A correlation heatmap"
+      ],
+      "correct_index": 1,
+      "explanation": "Scikit-learn is 'The Forecaster'. It moves you from describing the past to predicting the future: from 'turnover was 18%' to 'these employees are at higher flight risk next quarter'."
+    },
+    {
+      "id": "q13",
+      "library": "Scikit-learn",
+      "difficulty": 5,
+      "question": "Which Scikit-learn function splits your data into training and test sets so you can check model honesty?",
+      "options": [
+        "LabelEncoder()",
+        "feature_importances_",
+        "train_test_split(X, y, test_size=0.2, random_state=42)",
+        "LogisticRegression().fit()"
+      ],
+      "correct_index": 2,
+      "explanation": "train_test_split holds out a portion of data the model never sees in training, then tests on it. That is how you check whether the model genuinely learned or just memorized. random_state=42 makes the split reproducible."
+    },
+    {
+      "id": "q14",
+      "library": "Scikit-learn",
+      "difficulty": 5,
+      "question": "In Scikit-learn, what do LabelEncoder and OneHotEncoder do to columns like Department or Gender?",
+      "options": [
+        "Delete them from the dataset",
+        "Turn text categories into numbers a model can use",
+        "Plot them as a heatmap",
+        "Compute their p-value"
+      ],
+      "correct_index": 1,
+      "explanation": "Models need numbers, not text. LabelEncoder and OneHotEncoder convert categories like Department or Gender into numeric form the algorithm can train on."
+    },
+    {
+      "id": "q15",
+      "library": "Seaborn",
+      "difficulty": 5,
+      "question": "Which Seaborn call draws a correlation heatmap across numeric HR variables?",
+      "options": [
+        "sns.boxplot(x='Attrition', y='MonthlyIncome', data=df)",
+        "sns.heatmap(df.corr(numeric_only=True), annot=True, cmap='coolwarm')",
+        "sns.barplot(x='Department', y='Attrition', data=df)",
+        "sns.histplot(df['MonthlyIncome'])"
+      ],
+      "correct_index": 1,
+      "explanation": "sns.heatmap(df.corr(numeric_only=True), annot=True) shows which numeric factors move together with attrition. The deck calls this Seaborn's 'Illustrator' job: patterns leaders can read at a glance."
+    },
+    {
+      "id": "q16",
+      "library": "Statsmodels",
+      "difficulty": 6,
+      "question": "The deck says a p-value below what number means a pattern is unlikely to be chance alone?",
+      "options": ["0.50", "0.05", "0.95", "1.00"],
+      "correct_index": 1,
+      "explanation": "A p-value below 0.05 is the magic number: the observed pattern is unlikely to be random. That is the bar 'The Auditor' (Statsmodels) uses to call a finding real."
+    },
+    {
+      "id": "q17",
+      "library": "Seaborn",
+      "difficulty": 6,
+      "question": "The deck argues 'Findings that nobody understands change nothing.' This makes the case for which library?",
+      "options": ["Seaborn", "NumPy", "Pandas", "Statsmodels"],
+      "correct_index": 0,
+      "explanation": "That line is the case for Seaborn, 'The Illustrator'. Analysis only creates value when a CFO or CHRO can read it at a glance, and Seaborn is how your analysis earns its meeting slot."
+    },
+    {
+      "id": "q18",
+      "library": "Statsmodels",
+      "difficulty": 6,
+      "question": "In pay-equity work, the code smf.ols('MonthlyIncome ~ Gender + YearsAtCompany + Education') is an example of what?",
+      "options": [
+        "A random forest classifier",
+        "Ordinary least squares regression that controls for fair factors",
+        "A correlation heatmap",
+        "A NumPy percentile call"
+      ],
+      "correct_index": 1,
+      "explanation": "It is ordinary least squares regression. By including YearsAtCompany and Education alongside Gender, it asks: does a salary gap remain after the fair factors are counted? That is Statsmodels' 'Auditor' role."
+    },
+    {
+      "id": "q19",
+      "library": "Scikit-learn",
+      "difficulty": 7,
+      "question": "After training a Random Forest attrition model, which output shows which levers actually drive attrition in your data?",
+      "options": [
+        "train_test_split",
+        "feature_importances_",
+        "LabelEncoder",
+        "np.percentile"
+      ],
+      "correct_index": 1,
+      "explanation": "feature_importances_ ranks which variables matter most. The deck calls this 'boardroom gold': it shows which factors actually drive attrition in your data, not just that a pattern exists."
+    },
+    {
+      "id": "q20",
+      "library": "Pandas",
+      "difficulty": 7,
+      "question": "Grouping by 'OverTime' and then running value_counts on 'Attrition' reveals what workforce signal?",
+      "options": [
+        "The average salary by gender",
+        "The effect of overtime on turnover",
+        "The 25th percentile income",
+        "A pay-equity p-value"
+      ],
+      "correct_index": 1,
+      "explanation": "df.groupby('OverTime')['Attrition'].value_counts(normalize=True) shows how much more often overtime employees leave. It is a textbook Pandas 'Organizer' move for surfacing a turnover driver."
+    }
+  ]
+}
